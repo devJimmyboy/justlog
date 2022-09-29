@@ -6,14 +6,14 @@ import { store } from '../store'
 
 export type AvailableLogs = Array<{ month: string; year: string }>
 
-export function useAvailableLogs(channel: string | null, username: string | null): [AvailableLogs, Error | undefined] {
+export function useAvailableLogs(channel: string | null, username: string | null): [AvailableLogs, Error | null] {
   const { state, setState } = useContext(store)
 
-  const { data } = useQuery<[AvailableLogs, Error | undefined]>(
+  const { data, error, isLoading } = useQuery<AvailableLogs, Error>(
     ['availableLogs', { channel: channel, username: username }],
-    () => {
+    async () => {
       if (!channel || !username) {
-        return Promise.resolve([[], undefined])
+        return []
       }
 
       const channelIsId = isUserId(channel)
@@ -45,13 +45,10 @@ export function useAvailableLogs(channel: string | null, username: string | null
           throw Error(response.statusText)
         })
         .then((response) => response.json())
-        .then((data: { availableLogs: AvailableLogs }) => [data.availableLogs, undefined])
-        .catch((err) => {
-          return [[], err]
-        })
+        .then((data: { availableLogs: AvailableLogs }) => data.availableLogs)
     },
     { refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  return (data as [AvailableLogs, Error | undefined] | undefined) ?? [[], undefined]
+  return isLoading || !data ? [[], null] : [data, error]
 }
