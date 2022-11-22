@@ -28,13 +28,13 @@ type Server struct {
 	logPath       string
 	bot           *bot.Bot
 	cfg           *config.Config
-	fileLogger    *filelog.Logger
+	fileLogger    filelog.Logger
 	helixClient   helix.TwitchApiClient
 	assetsHandler http.Handler
 }
 
 // NewServer create api Server
-func NewServer(cfg *config.Config, bot *bot.Bot, fileLogger *filelog.Logger, helixClient helix.TwitchApiClient, assets fs.FS) Server {
+func NewServer(cfg *config.Config, bot *bot.Bot, fileLogger filelog.Logger, helixClient helix.TwitchApiClient, assets fs.FS) Server {
 	build, err := fs.Sub(assets, "web/build")
 	if err != nil {
 		log.Fatal("failed to read public assets")
@@ -82,6 +82,11 @@ type logList struct {
 	AvailableLogs []filelog.UserLogFile `json:"availableLogs"`
 }
 
+// swagger:model
+type channelLogList struct {
+	AvailableLogs []filelog.ChannelLogFile `json:"availableLogs"`
+}
+
 type chatMessage struct {
 	Text        string             `json:"text"`
 	Username    string             `json:"username"`
@@ -114,7 +119,10 @@ func (s *Server) Init() {
 func (s *Server) route(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.EscapedPath()
 
-	query := s.fillUserids(w, r)
+	query, err := s.fillUserids(w, r)
+	if err != nil {
+		return
+	}
 
 	if url == "/list" {
 		if s.cfg.IsOptedOut(query.Get("userid")) || s.cfg.IsOptedOut(query.Get("channelid")) {
@@ -152,7 +160,7 @@ func (s *Server) route(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) fillUserids(w http.ResponseWriter, r *http.Request) url.Values {
+func (s *Server) fillUserids(w http.ResponseWriter, r *http.Request) (url.Values, error) {
 	query := r.URL.Query()
 
 	if query.Get("userid") == "" && query.Get("user") != "" {
@@ -161,7 +169,12 @@ func (s *Server) fillUserids(w http.ResponseWriter, r *http.Request) url.Values 
 		users, err := s.helixClient.GetUsersByUsernames([]string{username})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return nil
+			return nil, err
+		}
+		if len(users) == 0 {
+			err := fmt.Errorf("could not find users")
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return nil, err
 		}
 
 		query.Set("userid", users[username].ID)
@@ -173,13 +186,18 @@ func (s *Server) fillUserids(w http.ResponseWriter, r *http.Request) url.Values 
 		users, err := s.helixClient.GetUsersByUsernames([]string{channelName})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return nil
+			return nil, err
+		}
+		if len(users) == 0 {
+			err := fmt.Errorf("could not find users")
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return nil, err
 		}
 
 		query.Set("channelid", users[channelName].ID)
 	}
 
-	return query
+	return query, nil
 }
 
 func (s *Server) routeLogs(w http.ResponseWriter, r *http.Request) bool {
@@ -228,6 +246,15 @@ func (s *Server) routeLogs(w http.ResponseWriter, r *http.Request) bool {
 
 	// Disable content type sniffing for log output
 	w.Header().Set("X-Content-Type-Options", "nosniff")
+
+	currentYear := fmt.Sprintf("%d", int(time.Now().Year()))
+	currentMonth := fmt.Sprintf("%d", int(time.Now().Month()))
+
+	if (request.time.year != "" && request.time.month != "") && (request.time.year < currentYear || (request.time.year == currentYear && request.time.month < currentMonth)) {
+		writeCacheControl(w, r, time.Hour*8760)
+	} else {
+		writeCacheControlNoCache(w, r)
+	}
 
 	if request.responseType == responseTypeJSON {
 		writeJSON(logs, http.StatusOK, w, r)
@@ -280,14 +307,14 @@ func reverseSlice(input []string) []string {
 //
 // List currently logged channels
 //
-//     Produces:
-//     - application/json
-//     - text/plain
+//	Produces:
+//	- application/json
+//	- text/plain
 //
-//     Schemes: https
+//	Schemes: https
 //
-//     Responses:
-//       200: AllChannelsJSON
+//	Responses:
+//	  200: AllChannelsJSON
 func (s *Server) writeAllChannels(w http.ResponseWriter, r *http.Request) {
 	response := new(AllChannelsJSON)
 	response.Channels = []channel{}
@@ -316,6 +343,14 @@ func writeJSON(data interface{}, code int, w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)
 	w.Write(js)
+}
+
+func writeCacheControl(w http.ResponseWriter, r *http.Request, cacheDuration time.Duration) {
+	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%.0f", cacheDuration.Seconds()))
+}
+
+func writeCacheControlNoCache(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-cache")
 }
 
 func writeRaw(cLog *chatLog, code int, w http.ResponseWriter, r *http.Request) {

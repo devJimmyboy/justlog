@@ -19,7 +19,7 @@ type Bot struct {
 	startTime   time.Time
 	cfg         *config.Config
 	helixClient helix.TwitchApiClient
-	fileLogger  *filelog.Logger
+	logger      filelog.Logger
 	worker      []*worker
 	channels    map[string]helix.UserData
 	clearchats  sync.Map
@@ -28,11 +28,18 @@ type Bot struct {
 
 type worker struct {
 	client         *twitch.Client
-	joinedChannels []string
+	joinedChannels map[string]bool
+}
+
+func newWorker(client *twitch.Client) *worker {
+	return &worker{
+		client:         client,
+		joinedChannels: map[string]bool{},
+	}
 }
 
 // NewBot create new bot instance
-func NewBot(cfg *config.Config, helixClient helix.TwitchApiClient, fileLogger *filelog.Logger) *Bot {
+func NewBot(cfg *config.Config, helixClient helix.TwitchApiClient, fileLogger filelog.Logger) *Bot {
 	channels, err := helixClient.GetUsersByUserIds(cfg.Channels)
 	if err != nil {
 		log.Fatalf("[bot] failed to load configured channels %s", err.Error())
@@ -41,7 +48,7 @@ func NewBot(cfg *config.Config, helixClient helix.TwitchApiClient, fileLogger *f
 	return &Bot{
 		cfg:         cfg,
 		helixClient: helixClient,
-		fileLogger:  fileLogger,
+		logger:      fileLogger,
 		channels:    channels,
 		worker:      []*worker{},
 		OptoutCodes: sync.Map{},
@@ -57,7 +64,7 @@ func (b *Bot) Say(channel, text string) {
 func (b *Bot) Connect() {
 	b.startTime = time.Now()
 	client := b.newClient()
-	b.initialJoins()
+	go b.startJoinLoop()
 
 	if strings.HasPrefix(b.cfg.Username, "justinfan") {
 		log.Info("[bot] joining as anonymous user")
@@ -66,6 +73,18 @@ func (b *Bot) Connect() {
 	}
 
 	log.Fatal(client.Connect())
+}
+
+// constantly join channels to rejoin some channels that got unbanned over time
+func (b *Bot) startJoinLoop() {
+	for {
+		for _, channel := range b.channels {
+			b.Join(channel.Login)
+		}
+
+		time.Sleep(time.Hour * 1)
+		log.Info("[bot] running hourly join loop")
+	}
 }
 
 func (b *Bot) Part(channelNames ...string) {
@@ -80,13 +99,21 @@ func (b *Bot) Part(channelNames ...string) {
 
 func (b *Bot) Join(channelNames ...string) {
 	for _, channel := range channelNames {
+		channel = strings.ToLower(channel)
 
 		joined := false
+
 		for _, worker := range b.worker {
+			if _, ok := worker.joinedChannels[channel]; ok {
+				// already joined but join again in case it was a temporary ban
+				b.Join(channel)
+				return
+			}
+
 			if len(worker.joinedChannels) < 50 {
 				log.Info("[bot] joining " + channel)
 				worker.client.Join(channel)
-				worker.joinedChannels = append(worker.joinedChannels, channel)
+				worker.joinedChannels[channel] = true
 				joined = true
 				break
 			}
@@ -105,7 +132,7 @@ func (b *Bot) newClient() *twitch.Client {
 		client.SetJoinRateLimiter(twitch.CreateVerifiedRateLimiter())
 	}
 
-	b.worker = append(b.worker, &worker{client, []string{}})
+	b.worker = append(b.worker, newWorker(client))
 	log.Infof("[bot] creating new twitch connection, new total: %d", len(b.worker))
 
 	client.OnPrivateMessage(b.handlePrivateMessage)
@@ -113,12 +140,6 @@ func (b *Bot) newClient() *twitch.Client {
 	client.OnClearChatMessage(b.handleClearChat)
 
 	return client
-}
-
-func (b *Bot) initialJoins() {
-	for _, channel := range b.channels {
-		b.Join(channel.Login)
-	}
 }
 
 func (b *Bot) handlePrivateMessage(message twitch.PrivateMessage) {
@@ -129,14 +150,14 @@ func (b *Bot) handlePrivateMessage(message twitch.PrivateMessage) {
 	}
 
 	go func() {
-		err := b.fileLogger.LogPrivateMessageForUser(message.User, message)
+		err := b.logger.LogPrivateMessageForUser(message.User, message)
 		if err != nil {
 			log.Error(err.Error())
 		}
 	}()
 
 	go func() {
-		err := b.fileLogger.LogPrivateMessageForChannel(message)
+		err := b.logger.LogPrivateMessageForChannel(message)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -149,7 +170,7 @@ func (b *Bot) handleUserNotice(message twitch.UserNoticeMessage) {
 	}
 
 	go func() {
-		err := b.fileLogger.LogUserNoticeMessageForUser(message.User.ID, message)
+		err := b.logger.LogUserNoticeMessageForUser(message.User.ID, message)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -157,7 +178,7 @@ func (b *Bot) handleUserNotice(message twitch.UserNoticeMessage) {
 
 	if _, ok := message.Tags["msg-param-recipient-id"]; ok {
 		go func() {
-			err := b.fileLogger.LogUserNoticeMessageForUser(message.Tags["msg-param-recipient-id"], message)
+			err := b.logger.LogUserNoticeMessageForUser(message.Tags["msg-param-recipient-id"], message)
 			if err != nil {
 				log.Error(err.Error())
 			}
@@ -165,7 +186,7 @@ func (b *Bot) handleUserNotice(message twitch.UserNoticeMessage) {
 	}
 
 	go func() {
-		err := b.fileLogger.LogUserNoticeMessageForChannel(message)
+		err := b.logger.LogUserNoticeMessageForChannel(message)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -202,14 +223,14 @@ func (b *Bot) handleClearChat(message twitch.ClearChatMessage) {
 	}
 
 	go func() {
-		err := b.fileLogger.LogClearchatMessageForUser(message.TargetUserID, message)
+		err := b.logger.LogClearchatMessageForUser(message.TargetUserID, message)
 		if err != nil {
 			log.Error(err.Error())
 		}
 	}()
 
 	go func() {
-		err := b.fileLogger.LogClearchatMessageForChannel(message)
+		err := b.logger.LogClearchatMessageForChannel(message)
 		if err != nil {
 			log.Error(err.Error())
 		}

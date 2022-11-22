@@ -70,7 +70,7 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
 
       for (const emote of thirdPartyEmotes) {
         if (buffer.trim() === emote.code) {
-          renderMessage.push(<Emote className="emote" key={x} alt={emote.code} src={emote.urls.small} />)
+          renderMessage.push(<Emote className="emote" key={x} alt={emote.code} title={emote.code} src={emote.urls.small} />)
           emoteFound = true
           buffer = ''
 
