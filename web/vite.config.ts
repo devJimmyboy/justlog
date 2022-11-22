@@ -10,7 +10,7 @@ export default defineConfig({
   define: {
     global: {},
   },
-  plugins: [react()],
+  plugins: [react({})],
   build: {
     outDir: 'build',
     rollupOptions: {},
@@ -20,6 +20,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/channel': {
+        target: 'http://localhost:8025',
+      },
+      '/list': {
+        target: 'http://localhost:8025',
+      },
       '/swagger.json': {
         target: 'http://localhost:8025',
       },

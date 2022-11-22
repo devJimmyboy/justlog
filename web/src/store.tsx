@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import React, { createContext, useState } from 'react'
 import { QueryClient } from 'react-query'
 import { useLocalStorage } from './hooks/useLocalStorage'
 
@@ -144,7 +144,7 @@ const StateProvider = ({ children }: { children: JSX.Element }): JSX.Element => 
     window.history.replaceState({}, 'justlog', url.toString())
   }
 
-  return <Provider value={{ state, setState, setSettings, setCurrents, setShowSwagger, setShowOptout }}>{children}</Provider>
+  return <store.Provider value={{ state, setState, setSettings, setCurrents, setShowSwagger, setShowOptout }}>{children}</store.Provider>
 }
 
 export { store, StateProvider }

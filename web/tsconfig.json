@@ -10,18 +10,20 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "module": "esnext",
+    "module": "ESNext",
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
     "noEmit": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "react",
+      "react-dom"
     ],
-    "jsx": "react-jsx"
+    "jsx": "react"
   },
   "include": [
     "src"

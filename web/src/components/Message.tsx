@@ -1,10 +1,11 @@
 import React, { useContext } from 'react'
-import Linkify from 'react-linkify'
+import Linkify from 'linkify-react'
 import styled from 'styled-components'
 import { store } from '../store'
 import { LogMessage } from '../types/log'
 import { ThirdPartyEmote } from '../types/ThirdPartyEmote'
 import runes from 'runes'
+import { Link } from '@mui/material'
 
 const MessageContainer = styled.div`
   a {
@@ -29,7 +30,7 @@ const Emote = styled.img`
 
 export function Message({ message, thirdPartyEmotes }: { message: LogMessage; thirdPartyEmotes: Array<ThirdPartyEmote> }): JSX.Element {
   const { state } = useContext(store)
-  const renderMessage = []
+  const renderMessage: React.ReactNode[] = []
 
   let replaced
   let buffer = ''
@@ -78,17 +79,7 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
       }
 
       if (!emoteFound) {
-        renderMessage.push(
-          <Linkify
-            key={x}
-            componentDecorator={(decoratedHref, decoratedText, key) => (
-              <a target="__blank" href={decoratedHref} key={key}>
-                {decoratedText}
-              </a>
-            )}>
-            {buffer}
-          </Linkify>
-        )
+        renderMessage.push(buffer)
         buffer = ''
       }
 
@@ -102,8 +93,17 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
 
   return (
     <MessageContainer className="message">
-      {renderMessagePrefix}
-      {renderMessage}
+      <Linkify
+        options={{
+          render: ({ attributes, content }) => (
+            <Link target="__blank" {...attributes}>
+              {content}
+            </Link>
+          ),
+        }}>
+        {renderMessagePrefix}
+        {renderMessage}
+      </Linkify>
     </MessageContainer>
   )
 }

@@ -70,11 +70,14 @@ export function Filters() {
           label="username"
           variant="filled"
           autoComplete="off"
+          inputProps={{
+            'data-form-type': 'other',
+          }}
           defaultValue={state.currentUsername}
           autoFocus={state.currentChannel !== null && state.currentUsername === null}
         />
         <Button variant="contained" color="primary" size="large" type="submit">
-          load
+          Load
         </Button>
         <Settings />
         {/* <Docs /> */}

@@ -31,7 +31,25 @@ const LogContainer = styled.div`
 export function Log({ year, month, initialLoad = false }: { year: string; month: string; initialLoad?: boolean }) {
   const { state } = useContext(store)
   const [load, setLoad] = useState(initialLoad)
+  const [txtHref, setTxtHref] = useState(state.apiBaseUrl)
 
+  React.useEffect(() => {
+    let href = state.apiBaseUrl
+    if (state.currentChannel && isUserId(state.currentChannel)) {
+      href += `/channelid/${getUserId(state.currentChannel)}`
+    } else {
+      href += `/channel/${state.currentChannel}`
+    }
+
+    if (state.currentUsername && isUserId(state.currentUsername)) {
+      href += `/userid/${getUserId(state.currentUsername)}`
+    } else {
+      href += `/user/${state.currentUsername}`
+    }
+
+    href += `/${year}/${month}?reverse`
+    setTxtHref(href)
+  }, [state.currentChannel, state.currentUsername, year, month, load])
   if (!load) {
     return (
       <LogContainer>
@@ -40,28 +58,12 @@ export function Log({ year, month, initialLoad = false }: { year: string; month:
     )
   }
 
-  let txtHref = `${state.apiBaseUrl}`
-  if (state.currentChannel && isUserId(state.currentChannel)) {
-    txtHref += `/channelid/${getUserId(state.currentChannel)}`
-  } else {
-    txtHref += `/channel/${state.currentChannel}`
-  }
-
-  if (state.currentUsername && isUserId(state.currentUsername)) {
-    txtHref += `/userid/${getUserId(state.currentUsername)}`
-  } else {
-    txtHref += `/user/${state.currentUsername}`
-  }
-
-  txtHref += `/${year}/${month}?reverse`
-
   return (
     <LogContainer>
       <a className="txt" target="__blank" href={txtHref} rel="noopener noreferrer">
         <Txt />
       </a>
-      {!state.settings.twitchChatMode.value && <ContentLog year={year} month={month} />}
-      {state.settings.twitchChatMode.value && <TwitchChatContentLog year={year} month={month} />}
+      {state.settings.twitchChatMode.value ? <TwitchChatContentLog year={year} month={month} /> : <ContentLog year={year} month={month} />}
     </LogContainer>
   )
 }

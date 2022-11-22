@@ -5,7 +5,8 @@ import styled from 'styled-components'
 import { useLog } from '../hooks/useLog'
 import { store } from '../store'
 import { LogLine } from './LogLine'
-import { FixedSizeList as List } from 'react-window'
+import { areEqual, FixedSizeList as List, ListChildComponentProps } from 'react-window'
+import { LogMessage } from '../types/log'
 
 const ContentLogContainer = styled.ul`
   padding: 0;
@@ -28,17 +29,20 @@ const ContentLogContainer = styled.ul`
   }
 `
 
+const Row = React.memo(
+  ({ index, style, data: logs }: ListChildComponentProps<LogMessage[]>) => (
+    <div key={logs[index].id ? logs[index].id : index} style={style}>
+      <LogLine message={logs[index]} />
+    </div>
+  ),
+  areEqual
+)
+
 export function ContentLog({ year, month }: { year: string; month: string }) {
   const { state, setState } = useContext(store)
   const [searchText, setSearchText] = useState('')
 
   const logs = useLog(state.currentChannel ?? '', state.currentUsername ?? '', year, month).filter((log) => log.text.toLowerCase().includes(searchText.toLowerCase()))
-
-  const Row = ({ index, style }: { index: number; style: CSSProperties }) => (
-    <div style={style}>
-      <LogLine key={logs[index].id ? logs[index].id : index} message={logs[index]} />
-    </div>
-  )
 
   const search = useRef<HTMLInputElement>(null)
 
@@ -68,7 +72,7 @@ export function ContentLog({ year, month }: { year: string; month: string }) {
           ),
         }}
       />
-      <List className="list" height={600} itemCount={logs.length} itemSize={20} width={'100%'}>
+      <List className="list" height={600} itemCount={logs.length} itemSize={20} width={'100%'} itemData={logs}>
         {Row}
       </List>
     </ContentLogContainer>
