@@ -42,11 +42,11 @@ const LogLineContainer = styled.li`
 
 export function LogLine({ message }: { message: LogMessage }) {
   const { state } = useContext(store)
-  const parsed = parseTwitchMessage(message.raw)
 
   if (state.settings.showEmotes.value) {
     return <LogLineWithEmotes message={message} />
   }
+  const parsed = parseTwitchMessage(message.raw)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
     <LogLineContainer className="logLine">
@@ -58,9 +58,10 @@ export function LogLine({ message }: { message: LogMessage }) {
 }
 
 export function LogLineWithEmotes({ message }: { message: LogMessage }) {
-  const thirdPartyEmotes = useThirdPartyEmotes(message.tags['room-id'])
+  // console.log(message.tags)
+  const parsed = parseTwitchMessage(message.raw) as PrivateMessage
+  const thirdPartyEmotes = useThirdPartyEmotes(parsed.channelId ?? parsed.tags.get('room-id') ?? '')
   const { state } = useContext(store)
-  const parsed = parseTwitchMessage(message.raw)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
     <LogLineContainer className="logLine">

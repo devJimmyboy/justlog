@@ -4,21 +4,19 @@ import { EmoteSet, FfzChannelEmotesResponse, FfzGlobalBadgesResponse } from '../
 import { Badge } from '../types/Badge'
 
 export function useFfzChannelBadges(channelId: string): Array<Badge> {
-  const { isLoading, error, data } = useQuery<{ room: FfzChannelEmotesResponse['room']; badges: FfzGlobalBadgesResponse }>(
+  const { isLoading, error, data } = useQuery<{ room: FfzChannelEmotesResponse['room'] }>(
     ['badges:ffz:channel', { channelId: channelId }],
     () => {
       if (channelId === '') {
-        return Promise.resolve({ room: {}, sets: {} })
+        return Promise.resolve({ room: {} })
       }
 
-      return Promise.all([
-        fetch(`https://api.frankerfacez.com/v1/room/id/${channelId}`)
-          .then((res) => res.json())
-          .then((res) => res?.room || null),
-        fetch(`https://api.frankerfacez.com/v1/badges`).then((res) => res.json()),
-      ]).then(([room, badges]) => {
-        return { room, badges }
-      })
+      return fetch(`https://api.frankerfacez.com/v1/room/id/${channelId}`)
+        .then((res) => res.json())
+        .then((res) => res?.room || null)
+        .then((room) => {
+          return { room }
+        })
     },
     QueryDefaults
   )
@@ -34,19 +32,24 @@ export function useFfzChannelBadges(channelId: string): Array<Badge> {
 
   const badges: Badge[] = []
 
-  for (const set of Object.values(data.room.user_badges) as Array<EmoteSet>) {
-    for (const channelEmote of set.emoticons) {
-      badges.push({
-        id: String(channelEmote.id),
-        code: channelEmote.name,
-        urls: {
-          small: channelEmote.urls['1'],
-          medium: channelEmote.urls['2'],
-          big: channelEmote.urls['4'],
-        },
-      })
-    }
-  }
+  badges.push({
+    code: '',
+    users: [],
+    urls: {
+      big: `https:${data.room.mod_urls['4']}`,
+      medium: `https:${data.room.mod_urls['2']}`,
+      small: `https:${data.room.mod_urls['1']}`,
+    },
+  })
+  badges.push({
+    code: '',
+    users: [],
+    urls: {
+      big: `https:${data.room.vip_badge['4']}`,
+      medium: `https:${data.room.vip_badge['2']}`,
+      small: `https:${data.room.vip_badge['1']}`,
+    },
+  })
 
-  return emotes
+  return badges
 }

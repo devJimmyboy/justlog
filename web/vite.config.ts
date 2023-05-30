@@ -7,13 +7,12 @@ export default defineConfig({
       '@mui/styled-engine': '@mui/styled-engine-sc',
     },
   },
-  define: {
-    global: {},
-  },
+  define: {},
   plugins: [react({})],
   build: {
     outDir: 'build',
     rollupOptions: {},
+    sourcemap: 'inline',
   },
   optimizeDeps: {
     exclude: [],
