@@ -8,10 +8,10 @@ export function use7tvChannelEmotes(channelId: string): Array<ThirdPartyEmote> {
     ['7tv:channel', { channelId: channelId }],
     () => {
       if (channelId === '') {
-        return Promise.resolve([])
+        return Promise.resolve(<StvChannelEmotesResponse>{})
       }
 
-      return fetch(`https://api.7tv.app/v2/users/${channelId}/emotes`).then((res) => {
+      return fetch(`https://7tv.io/v3/users/twitch/${channelId}`).then((res) => {
         if (res.ok) {
           return res.json() as Promise<StvChannelEmotesResponse>
         }
@@ -33,14 +33,16 @@ export function use7tvChannelEmotes(channelId: string): Array<ThirdPartyEmote> {
 
   const emotes = []
 
-  for (const channelEmote of data ?? []) {
+  for (const channelEmote of data?.emote_set?.emotes ?? []) {
+    const webpEmotes = channelEmote.data.host.files.filter((i) => i.format === 'WEBP')
+    const emoteURL = channelEmote.data.host.url
     emotes.push({
       id: channelEmote.id,
       code: channelEmote.name,
       urls: {
-        small: channelEmote.urls[0][1],
-        medium: channelEmote.urls[1][1],
-        big: channelEmote.urls[3][1],
+        small: `${emoteURL}/${webpEmotes[0].name}`,
+        medium: `${emoteURL}/${webpEmotes[1].name}`,
+        big: `${emoteURL}/${webpEmotes[2].name}`,
       },
     })
   }

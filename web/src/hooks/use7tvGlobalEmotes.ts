@@ -4,18 +4,15 @@ import { StvGlobalEmotesResponse } from '../types/7tv'
 import { ThirdPartyEmote } from '../types/ThirdPartyEmote'
 
 export function use7tvGlobalEmotes(): Array<ThirdPartyEmote> {
-  const { isLoading, error, data } = useQuery(
-    '7tv:global',
-    async () => {
-      const res = await fetch('https://api.7tv.app/v2/emotes/global')
+  const { isLoading, error, data } = useQuery('7tv:global', () => {
+    return fetch('https://7tv.io/v3/emote-sets/global').then((res) => {
       if (res.ok) {
-        return (await res.json()) as Promise<StvGlobalEmotesResponse>
+        return res.json() as Promise<StvGlobalEmotesResponse>
       }
 
       return Promise.reject(res.statusText)
-    },
-    QueryDefaults
-  )
+    }, QueryDefaults)
+  })
 
   if (isLoading || !data) {
     return []
@@ -28,14 +25,16 @@ export function use7tvGlobalEmotes(): Array<ThirdPartyEmote> {
 
   const emotes = []
 
-  for (const channelEmote of data ?? []) {
+  for (const channelEmote of data.emotes ?? []) {
+    const webpEmotes = channelEmote.data.host.files.filter((i) => i.format === 'WEBP')
+    const emoteURL = channelEmote.data.host.url
     emotes.push({
       id: channelEmote.id,
       code: channelEmote.name,
       urls: {
-        small: channelEmote.urls[0][1],
-        medium: channelEmote.urls[1][1],
-        big: channelEmote.urls[3][1],
+        small: `${emoteURL}/${webpEmotes[0].name}`,
+        medium: `${emoteURL}/${webpEmotes[1].name}`,
+        big: `${emoteURL}/${webpEmotes[2].name}`,
       },
     })
   }
