@@ -7,9 +7,9 @@ export default defineConfig({
       '@mui/styled-engine': '@mui/styled-engine-sc',
     },
   },
-  define: {
-    global: {},
-  },
+  // define: {
+  //   global: 'window',
+  // },
   plugins: [react({})],
   build: {
     rollupOptions: {},
@@ -18,6 +18,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: [],
   },
+
   server: {
     proxy: {
       '/channel': {

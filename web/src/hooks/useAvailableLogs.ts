@@ -6,14 +6,15 @@ import { store } from '../store'
 
 export type AvailableLogs = Array<{ month: string; year: string }>
 
-export function useAvailableLogs(channel: string | null, username: string | null): [AvailableLogs, Error | null] {
+export function useAvailableLogs(channel: string | null, username: string | null): [AvailableLogs, Error | undefined] {
   const { state, setState } = useContext(store)
 
-  const { data, error, isLoading } = useQuery<AvailableLogs, Error>(
+  // @ts-ignore I don't understand this error :)
+  const { data } = useQuery<[AvailableLogs, Error | undefined]>(
     ['availableLogs', { channel: channel, username: username }],
-    async () => {
+    () => {
       if (!channel || !username) {
-        return []
+        return Promise.resolve([[], undefined])
       }
 
       const channelIsId = isUserId(channel)
@@ -45,10 +46,13 @@ export function useAvailableLogs(channel: string | null, username: string | null
           throw Error(response.statusText)
         })
         .then((response) => response.json())
-        .then((data: { availableLogs: AvailableLogs }) => data.availableLogs)
+        .then((data: { availableLogs: AvailableLogs }) => [data.availableLogs, undefined])
+        .catch((err) => {
+          return [[], err]
+        })
     },
     { refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  return isLoading || !data ? [[], null] : [data, error]
+  return (data as [AvailableLogs, Error | undefined] | undefined) ?? [[], undefined]
 }

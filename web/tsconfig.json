@@ -6,7 +6,6 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "types": ["vite/client"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -24,7 +23,7 @@
       "react",
       "react-dom"
     ],
-    "jsx": "react"
+    "jsx": "react-jsx"
   },
   "include": [
     "src"

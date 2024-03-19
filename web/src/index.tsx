@@ -1,14 +1,6 @@
-import React from 'react'
-import { useContext } from 'react'
-import ReactDOM from 'react-dom/client'
-import { QueryClientProvider } from 'react-query'
-import { Page } from './components/Page'
-import { StateProvider, store } from './store'
-import { unstable_createMuiStrictModeTheme as createMuiTheme } from '@mui/material'
-import { ThemeProvider } from '@mui/material/styles'
-// import axios, { AxiosInstance } from 'axios'
 import { ClientCredentialsAuthProvider } from '@twurple/auth'
 import { ApiClient, HelixChatBadgeSet } from '@twurple/api'
+import 'react-link-previewer/src/style.css'
 
 globalThis.twitchAuth = new ClientCredentialsAuthProvider(import.meta.env.VITE_CLIENT_ID, import.meta.env.VITE_CLIENT_SECRET)
 
@@ -24,8 +16,16 @@ declare global {
   var twitchAuth: ClientCredentialsAuthProvider
   var badges: HelixChatBadgeSet[]
 }
+import { StrictMode } from 'react'
+import { useContext } from 'react'
+import { createRoot } from 'react-dom/client'
+import { QueryClientProvider } from 'react-query'
+import { Page } from './components/Page'
+import { StateProvider, store } from './store'
+import { createTheme } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 
-const pageTheme = createMuiTheme({
+const pageTheme = createTheme({
   palette: {
     mode: 'dark',
   },
@@ -41,14 +41,15 @@ function App() {
   )
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root')!)
+const container = document.getElementById('root') as Element
+const root = createRoot(container)
 
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <StateProvider>
       <ThemeProvider theme={pageTheme}>
         <App />
       </ThemeProvider>
     </StateProvider>
-  </React.StrictMode>
+  </StrictMode>
 )
