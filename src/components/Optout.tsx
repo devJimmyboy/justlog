@@ -74,18 +74,18 @@ export function OptoutPanel() {
       <p>
         You can opt out from being logged. This will also disable access to your previously logged data.
         <br />
-        This applies to all chats of that justlog instance.
+        This applies to all chats of that rustlog instance.
         <br />
         Opting out is permanent, there is no reverse action. So think twice if you want to opt out.
       </p>
       <p>
-        If you still want to optout generate a token here and paste the command into a logged chat.
+        Note that there might not be a confirmation message.
         <br />
         You will receive a confirmation message from the bot "@username, opted you out".
       </p>
       <br />
       <div>
-        <code>!justlog optout {'<code>'}</code>
+        <code>!rustlog optout {'<code>'}</code>
       </div>
       <div className="generator">
         <input readOnly type="text" value={code} />
