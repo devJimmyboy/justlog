@@ -2,6 +2,9 @@ import { Stack, Tooltip } from '@mui/material'
 import { ChatMessage } from '@twurple/chat'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import { ChannelBadge } from '../types/Badge'
+import { useBadges } from '../hooks/useBadges'
+import { useUserBadges } from '../hooks/useUserBadges'
 
 const UserRoot = styled.div`
   display: inline-flex;
@@ -49,36 +52,66 @@ const UserBadge = styled.img`
 
 export function User({ displayName, color, badges, parsed }: { displayName: string; color: string; badges: string[]; parsed: ChatMessage }): JSX.Element {
   const renderColor = color !== '' ? color : 'grey'
-  const [render, setRendering] = useState(false)
-  useEffect(() => {
-    if (!window.badges) setTimeout(() => setRendering(true), 250)
-    else setRendering(true)
-  }, [])
-  if (!render) return null
+  // const [render, setRendering] = useState(false)
+  // useEffect(() => {
+  //   setRendering(true)
+  // }, [])
+  // if (!render) return null
+  const channelBadges = useBadges(parsed.channelId)
+  const userBadges = useUserBadges(parsed.userInfo.userId)
 
   return (
     <UserRoot>
-      {badges.map((badge, i) => {
-        const [name, version] = badge.split('/')
-
-        const bdge = window.badges.find((b) => b.id === name)
-        if (bdge) {
-          const url = bdge.getVersion(version)?.getImageUrl(2) ?? null
+      {badges.map((badgeId, i) => {
+        const badge = channelBadges.get(badgeId)
+        if (badge) {
+          const url = badge.urls.medium ?? null
           if (!url) return null
           return (
             <Tooltip
               key={`badge-${parsed.date.toISOString()}-${i}`}
               title={
                 <Stack justifyContent="center">
-                  <img src={url} />
-                  <span>{bdge.id}</span>
+                  <img src={badge.urls.big} />
+                  <span>{badge.title}</span>
                 </Stack>
               }>
-              <UserBadge src={url} style={{ height: '1.1rem' }} />
+              {badge.action ? (
+                <a href={badge.action} target={badge.code}>
+                  <UserBadge src={url} style={{ height: '1.1rem' }} />{' '}
+                </a>
+              ) : (
+                <UserBadge
+                  src={url}
+                  style={{ height: '1.1rem', backgroundColor: badge.code === 'moderator/1' ? '#34ae0a' : 'transparent', borderRadius: badge.code === 'moderator/1' ? '0.15em' : '0' }}
+                />
+              )}
             </Tooltip>
           )
         }
         return null
+      })}
+      {userBadges.badges.map((badge, i) => {
+        const url = badge.urls.medium ?? null
+        if (!url) return null
+        return (
+          <Tooltip
+            key={`badge-${parsed.date.toISOString()}-${i}`}
+            title={
+              <Stack justifyContent="center">
+                <img src={badge.urls.medium} style={{ maxHeight: 128, aspectRatio: 1 }} />
+                <span>{badge.title}</span>
+              </Stack>
+            }>
+            {badge.action ? (
+              <a href={badge.action} target={badge.code}>
+                <UserBadge src={url} style={{ height: '1.1rem' }} />{' '}
+              </a>
+            ) : (
+              <UserBadge src={url} style={{ height: '1.1rem' }} />
+            )}
+          </Tooltip>
+        )
       })}
       <UserContainer color={renderColor} className="user">
         {displayName}:

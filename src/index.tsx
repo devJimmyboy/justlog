@@ -2,21 +2,6 @@ import { AppTokenAuthProvider } from '@twurple/auth'
 import { ApiClient, HelixChatBadgeSet } from '@twurple/api'
 import 'react-link-previewer/src/style.css'
 
-window.twitchAuth = new AppTokenAuthProvider(import.meta.env.VITE_CLIENT_ID, import.meta.env.VITE_CLIENT_SECRET)
-
-window.twitchApi = new ApiClient({
-  authProvider: twitchAuth,
-})
-twitchApi.chat.getGlobalBadges().then((badges) => {
-  window.badges = badges
-})
-
-declare global {
-  var twitchApi: ApiClient
-  var twitchAuth: AppTokenAuthProvider
-  var badges: HelixChatBadgeSet[]
-  // var global: Global & typeof globalThis
-}
 import { StrictMode } from 'react'
 import { useContext } from 'react'
 import { createRoot } from 'react-dom/client'

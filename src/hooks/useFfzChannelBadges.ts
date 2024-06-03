@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query'
 import { QueryDefaults } from '../store'
 import { EmoteSet, FfzChannelEmotesResponse, FfzGlobalBadgesResponse } from '../types/Ffz'
-import { Badge } from '../types/Badge'
+import { ChannelBadge } from '../types/Badge'
 
-export function useFfzChannelBadges(channelId: string): Array<Badge> {
+export function useFfzChannelBadges(channelId: string): { mod: ChannelBadge | null; vip: ChannelBadge | null; isLoading: boolean } {
   const { isLoading, error, data } = useQuery<{ room: FfzChannelEmotesResponse['room'] }>(
     ['badges:ffz:channel', { channelId: channelId }],
     () => {
@@ -22,34 +22,51 @@ export function useFfzChannelBadges(channelId: string): Array<Badge> {
   )
 
   if (isLoading || !data?.room) {
-    return []
+    return {
+      mod: null,
+      vip: null,
+      isLoading,
+    }
   }
 
   if (error) {
     console.error(error)
-    return []
+    return {
+      mod: null,
+      vip: null,
+      isLoading,
+    }
   }
 
-  const badges: Badge[] = []
+  const badges: { mod: ChannelBadge | null; vip: ChannelBadge | null; isLoading: boolean } = {
+    mod: null,
+    vip: null,
+    isLoading,
+  }
+  if (!data.room.mod_urls || !data.room.vip_badge) {
+    return badges
+  }
 
-  badges.push({
-    code: '',
-    users: [],
+  badges.mod = {
+    code: 'moderator/1',
+    title: 'Moderator',
     urls: {
-      big: `https:${data.room.mod_urls['4']}`,
-      medium: `https:${data.room.mod_urls['2']}`,
-      small: `https:${data.room.mod_urls['1']}`,
+      big: data.room.mod_urls['4'],
+      medium: data.room.mod_urls['2'],
+      small: data.room.mod_urls['1'],
     },
-  })
-  badges.push({
-    code: '',
-    users: [],
+    action: null,
+  }
+  badges.vip = {
+    code: 'vip/1',
+    title: 'VIP',
     urls: {
-      big: `https:${data.room.vip_badge['4']}`,
-      medium: `https:${data.room.vip_badge['2']}`,
-      small: `https:${data.room.vip_badge['1']}`,
+      big: data.room.vip_badge['4'],
+      medium: data.room.vip_badge['2'],
+      small: data.room.vip_badge['1'],
     },
-  })
+    action: 'https://help.twitch.tv/customer/en/portal/articles/659115-twitch-chat-badges-guide',
+  }
 
   return badges
 }

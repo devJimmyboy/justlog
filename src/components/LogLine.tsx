@@ -9,6 +9,7 @@ import { User } from './User'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { parseTwitchMessage, ChatMessage } from '@twurple/chat'
+import { useBadges } from '../hooks/useBadges'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

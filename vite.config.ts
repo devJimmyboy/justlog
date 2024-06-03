@@ -15,9 +15,6 @@ export default defineConfig({
       '/list': {
         target: 'http://localhost:8025',
       },
-      '/swagger.json': {
-        target: 'http://localhost:8025',
-      },
     },
   },
 })
