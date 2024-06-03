@@ -5,9 +5,9 @@ import { useQueryClient } from 'react-query'
 import styled from 'styled-components'
 import { useChannels } from '../hooks/useChannels'
 import { store } from '../store'
-// import { Docs } from './Docs'
 import { Optout } from './Optout'
 import { Settings } from './Settings'
+import { Docs } from './Docs'
 
 const FiltersContainer = styled.form`
   display: inline-flex;
@@ -77,7 +77,7 @@ export function Filters() {
           load
         </Button>
         <Settings />
-        {/* <Docs /> */}
+        <Docs />
         <Optout />
       </FiltersContainer>
     </FiltersWrapper>

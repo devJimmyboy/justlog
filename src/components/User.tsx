@@ -58,7 +58,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
   // }, [])
   // if (!render) return null
   const channelBadges = useBadges(parsed.channelId)
-  const userBadges = useUserBadges(parsed.userInfo.userId)
+  const userBadges = useUserBadges(parsed.userInfo?.userId)
 
   return (
     <UserRoot>

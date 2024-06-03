@@ -2,9 +2,6 @@ import React, { useContext } from 'react'
 import styled from 'styled-components'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { IconButton } from '@mui/material'
-import SwaggerUI from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
-import ReactDOM from 'react-dom'
 import { store } from '../store'
 
 const DocsWrapper = styled.div``

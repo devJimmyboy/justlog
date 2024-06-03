@@ -99,6 +99,7 @@ export function useUserBadges(userId: string): {
   } = useQuery<{ id: string; kind: 'BADGE' | 'PAINT'; selected: boolean }[]>(
     ['cosmetics:user', { userId: userId }],
     async () => {
+      if (!userId) return []
       const stvID = (await axios.get(`https://7tv.io/v3/users/twitch/${userId}`)).data?.user?.id
       const sevenTvBadges = await axios
         .post<{ data: { user: { cosmetics: { id: string; kind: 'BADGE' | 'PAINT'; selected: boolean }[] } } }>('https://7tv.io/v3/gql', {
