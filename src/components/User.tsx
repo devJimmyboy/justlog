@@ -65,7 +65,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
       {badges.map((badgeId, i) => {
         const badge = channelBadges.get(badgeId)
         if (badge) {
-          const url = badge.urls.medium ?? null
+          const url = badge.urls.small ?? null
           if (!url) return null
           return (
             <Tooltip
@@ -83,7 +83,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
               ) : (
                 <UserBadge
                   src={url}
-                  style={{ height: '1.1rem', backgroundColor: badge.code === 'moderator/1' ? '#34ae0a' : 'transparent', borderRadius: badge.code === 'moderator/1' ? '0.15em' : '0' }}
+                  style={{ height: '1.1rem', backgroundColor: badge.code === 'moderator/1' ? '#00ad03' : 'transparent', borderRadius: badge.code === 'moderator/1' ? '0.15em' : '0' }}
                 />
               )}
             </Tooltip>
@@ -98,8 +98,8 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
           <Tooltip
             key={`badge-${parsed.date.toISOString()}-${i}`}
             title={
-              <Stack justifyContent="center">
-                <img src={badge.urls.medium} style={{ maxHeight: 128, aspectRatio: 1 }} />
+              <Stack justifyContent="center" alignContent="center">
+                <img src={badge.urls.medium} style={{ maxHeight: 128, maxWidth: 128 }} />
                 <span>{badge.title}</span>
               </Stack>
             }>

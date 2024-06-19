@@ -74,6 +74,7 @@ export function ContentLog({ year, month }: { year: string; month: string }) {
       />
       {/*@ts-ignore*/}
       <List className="list" height={600} itemCount={logs.length} itemSize={20} width={'100%'} itemData={logs}>
+        {/*@ts-ignore*/}
         {Row}
       </List>
     </ContentLogContainer>
