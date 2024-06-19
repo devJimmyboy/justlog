@@ -1,6 +1,5 @@
 import { AppTokenAuthProvider } from '@twurple/auth'
 import { ApiClient, HelixChatBadgeSet } from '@twurple/api'
-import 'react-link-previewer/src/style.css'
 
 import { StrictMode } from 'react'
 import { useContext } from 'react'

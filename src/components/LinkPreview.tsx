@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import { ReactLinkPreviewComponentProps } from 'react-link-previewer'
+// import { ReactLinkPreviewComponentProps } from 'react-link-previewer'
 import { useLinkPreview } from '../hooks/useLinkPreview'
-import cx from 'classnames'
 import { Box, Link, Typography } from '@mui/material'
+
+export type ReactLinkPreviewComponentProps = {
+  children?: React.ReactNode
+  href: string
+  host?: string
+  fetchOptions?: RequestInit
+  external?: boolean
+} & React.HTMLAttributes<HTMLAnchorElement>
 
 export const LinkPreview = ({ children, href, host, fetchOptions, external, ...props }: ReactLinkPreviewComponentProps) => {
   const { data, error } = useLinkPreview({
