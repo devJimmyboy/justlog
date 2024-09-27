@@ -5,7 +5,8 @@ import { store } from '../store'
 import type { Emote as IEmote, LogMessage } from '../types/log'
 import { ThirdPartyEmote } from '../types/ThirdPartyEmote'
 import runes from 'runes'
-import { Link, Tooltip } from '@mui/material'
+import { Link } from '@mui/material'
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import { LinkPreview } from './LinkPreview'
 
 const MessageContainer = styled.div`
@@ -68,7 +69,7 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
   let messageText = message.text
   let renderMessagePrefix = ''
   if (message.tags['system-msg']) {
-    messageText = messageText.replace(message.tags['system-msg'] + ' ', '')
+    messageText = messageText.replace(message.tags['system-msg'], '')
 
     renderMessagePrefix = `${message.tags['system-msg']} `
   }
@@ -126,11 +127,18 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
       <Linkify
         options={{
           render: ({ attributes, content }) => (
-            <Tooltip title={<LinkPreview href={attributes.href} />}>
+            <CustomTooltip
+              followCursor
+              placement="right-start"
+              title={<LinkPreview href={attributes.href} />}
+              style={{
+                borderRadius: 0,
+                backgroundColor: '#00000066+',
+              }}>
               <Link target="__blank" {...attributes}>
                 {content}
               </Link>
-            </Tooltip>
+            </CustomTooltip>
           ),
         }}>
         {renderMessagePrefix}
@@ -139,3 +147,10 @@ export function Message({ message, thirdPartyEmotes }: { message: LogMessage; th
     </MessageContainer>
   )
 }
+
+export const CustomTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} followCursor placement="right-start" classes={{ popper: className }} />)`
+  .${tooltipClasses.tooltip} {
+    background-color: #000000ac;
+    border-radius: 0;
+  }
+`

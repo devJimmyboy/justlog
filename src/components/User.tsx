@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { ChannelBadge } from '../types/Badge'
 import { useBadges } from '../hooks/useBadges'
 import { useUserBadges } from '../hooks/useUserBadges'
+import { CustomTooltip } from './Message'
 
 const UserRoot = styled.div`
   display: inline-flex;
@@ -70,7 +71,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
           const url = badge.urls.small ?? null
           if (!url) return null
           return (
-            <Tooltip
+            <CustomTooltip
               key={`badge-${parsed.date.toISOString()}-${i}`}
               title={
                 <Stack justifyContent="center">
@@ -88,7 +89,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
                   style={{ height: '1.1rem', backgroundColor: badge.code === 'moderator/1' ? '#00ad03' : 'transparent', borderRadius: badge.code === 'moderator/1' ? '0.15em' : '0' }}
                 />
               )}
-            </Tooltip>
+            </CustomTooltip>
           )
         }
         return null
@@ -100,7 +101,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
         const url = badge.urls.small ?? null
         if (!url) return null
         return (
-          <Tooltip
+          <CustomTooltip
             key={`badge-${parsed.date.toISOString()}-${i}`}
             title={
               <Stack justifyContent="center" alignContent="center">
@@ -115,7 +116,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
             ) : (
               <UserBadge src={url} style={{ height: '1.1rem' }} />
             )}
-          </Tooltip>
+          </CustomTooltip>
         )
       })}
       <UserContainer color={renderColor} className="user">

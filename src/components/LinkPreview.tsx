@@ -17,17 +17,35 @@ export const LinkPreview = ({ children, href, host, fetchOptions, external, ...p
     host,
     fetchOptions,
   })
+  let dataUrl = href
+  let dataTitle = data?.title
+  let dataDescription = data?.description
+
+  if (dataUrl && dataUrl.includes('i.imgur.com')) {
+    dataDescription = null
+  }
+
+  if (dataUrl && dataUrl.includes('gyazo.com')) {
+    dataDescription = null
+    dataTitle = null
+  }
+
+  if (dataTitle === dataDescription) {
+    dataDescription = null
+  }
 
   if (data && (data.mediaType === 'image' || href.includes('i.imgur.com'))) return <img loading="lazy" src={data.url} style={{ width: '100%' }} />
   return (
     <>
       {data && (
         <Box aria-hidden={true} sx={{ width: '100%' }}>
-          <Link {...props} href={href} style={{ maxWidth: '100%' }}>
-            <h2>{data.title}</h2>
-          </Link>
-          <Typography textOverflow="clip">{data.description}</Typography>
           <img loading="lazy" src={!data.images || data.images.length === 0 ? data.favicons?.[0] ?? '' : data.images[data.images.length - 1]} style={{ width: '100%' }} />
+          {dataTitle && (
+            <Typography {...props} style={{ maxWidth: '100%' }} fontSize={8}>
+              <h2>{dataTitle}</h2>
+            </Typography>
+          )}
+          {dataDescription && <Typography textOverflow="clip">{dataDescription}</Typography>}
         </Box>
       )}
 
