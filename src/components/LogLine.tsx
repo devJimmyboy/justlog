@@ -43,14 +43,14 @@ const LogLineContainer = styled.li`
 
 export function LogLine({ message }: { message: LogMessage }) {
   const { state } = useContext(store)
-
+  const isSysMsg = !!message.tags['system-msg'] || message.type == 4
   if (state.settings.showEmotes.value) {
-    return <LogLineWithEmotes message={message} />
+    return <LogLineWithEmotes message={message} sysMsg={isSysMsg} />
   }
   const parsed = parseTwitchMessage(message.raw)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
-    <LogLineContainer className="logLine">
+    <LogLineContainer className="logLine" style={isSysMsg ? { backgroundColor: '#562b70a3', paddingBlock: 1, paddingRight: 8, width: 'fit-content' } : {}}>
       {state.settings.showTimestamp.value && <span className="timestamp">{timestamp}</span>}
       {state.settings.showName.value && <User parsed={parsed as any} displayName={message.displayName} color={message.tags['color']} badges={message.tags['badges'].split(',')} />}
       <Message message={message} thirdPartyEmotes={[]} />
@@ -58,14 +58,14 @@ export function LogLine({ message }: { message: LogMessage }) {
   )
 }
 
-export function LogLineWithEmotes({ message }: { message: LogMessage }) {
+export function LogLineWithEmotes({ message, sysMsg }: { message: LogMessage; sysMsg?: boolean }) {
   // console.log(message.tags)
   const parsed = parseTwitchMessage(message.raw) as ChatMessage
   const thirdPartyEmotes = useThirdPartyEmotes(parsed.channelId ?? parsed.tags.get('room-id') ?? '')
   const { state } = useContext(store)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
-    <LogLineContainer className="logLine">
+    <LogLineContainer className="logLine" style={sysMsg ? { backgroundColor: '#562b70a3', paddingBlock: 1, paddingRight: 8, width: 'fit-content' } : {}}>
       {state.settings.showTimestamp.value && <span className="timestamp">{timestamp}</span>}
       {state.settings.showName.value && <User parsed={parsed as any} displayName={message.displayName} color={message.tags['color']} badges={message.tags?.['badges']?.split(',') ?? []} />}
       <Message message={message} thirdPartyEmotes={thirdPartyEmotes} />
