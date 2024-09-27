@@ -43,29 +43,32 @@ export function useFfzChannelBadges(channelId: string): { mod: ChannelBadge | nu
     vip: null,
     isLoading,
   }
-  if (!data.room.mod_urls || !data.room.vip_badge) {
+  if (!data.room.mod_urls && !data.room.vip_badge) {
     return badges
   }
-
-  badges.mod = {
-    code: 'moderator/1',
-    title: 'Moderator',
-    urls: {
-      big: data.room.mod_urls['4'],
-      medium: data.room.mod_urls['2'],
-      small: data.room.mod_urls['1'],
-    },
-    action: null,
+  if (data.room.mod_urls) {
+    badges.mod = {
+      code: 'moderator/1',
+      title: 'Moderator',
+      urls: {
+        big: data.room.mod_urls['4'],
+        medium: data.room.mod_urls['2'],
+        small: data.room.mod_urls['1'],
+      },
+      action: null,
+    }
   }
-  badges.vip = {
-    code: 'vip/1',
-    title: 'VIP',
-    urls: {
-      big: data.room.vip_badge['4'],
-      medium: data.room.vip_badge['2'],
-      small: data.room.vip_badge['1'],
-    },
-    action: 'https://help.twitch.tv/customer/en/portal/articles/659115-twitch-chat-badges-guide',
+  if (data.room.vip_badge) {
+    badges.vip = {
+      code: 'vip/1',
+      title: 'VIP',
+      urls: {
+        big: data.room.vip_badge['4'],
+        medium: data.room.vip_badge['2'],
+        small: data.room.vip_badge['1'],
+      },
+      action: 'https://help.twitch.tv/customer/en/portal/articles/659115-twitch-chat-badges-guide',
+    }
   }
 
   return badges

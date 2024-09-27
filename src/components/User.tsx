@@ -94,8 +94,8 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
         return null
       })}
       {userBadges.badges.map((badge, i) => {
-        var ffz = false
-        if (badge.urls.small.includes('franker')) ffz = true
+        // var ffz = false
+        // if (badge.urls.small.includes('franker')) ffz = true
 
         const url = badge.urls.small ?? null
         if (!url) return null
@@ -104,7 +104,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
             key={`badge-${parsed.date.toISOString()}-${i}`}
             title={
               <Stack justifyContent="center" alignContent="center">
-                <img src={url} style={{ maxHeight: 128, maxWidth: 128 }} />
+                <img src={badge.urls.big} style={{ maxHeight: 128, maxWidth: 128 }} />
                 <span>{badge.title}</span>
               </Stack>
             }>
