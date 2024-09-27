@@ -65,6 +65,8 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
       {badges.map((badgeId, i) => {
         const badge = channelBadges.get(badgeId)
         if (badge) {
+          var ffz = false
+          if (badge.urls.small.includes('franker')) ffz = true
           const url = badge.urls.small ?? null
           if (!url) return null
           return (
@@ -72,7 +74,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
               key={`badge-${parsed.date.toISOString()}-${i}`}
               title={
                 <Stack justifyContent="center">
-                  <img src={badge.urls.big} />
+                  <img src={ffz ? url : badge.urls.big} />
                   <span>{badge.title}</span>
                 </Stack>
               }>
@@ -92,14 +94,17 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
         return null
       })}
       {userBadges.badges.map((badge, i) => {
-        const url = badge.urls.medium ?? null
+        var ffz = false
+        if (badge.urls.small.includes('franker')) ffz = true
+
+        const url = badge.urls.small ?? null
         if (!url) return null
         return (
           <Tooltip
             key={`badge-${parsed.date.toISOString()}-${i}`}
             title={
               <Stack justifyContent="center" alignContent="center">
-                <img src={badge.urls.medium} style={{ maxHeight: 128, maxWidth: 128 }} />
+                <img src={url} style={{ maxHeight: 128, maxWidth: 128 }} />
                 <span>{badge.title}</span>
               </Stack>
             }>
