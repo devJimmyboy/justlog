@@ -43,14 +43,28 @@ const LogLineContainer = styled.li`
 
 export function LogLine({ message }: { message: LogMessage }) {
   const { state } = useContext(store)
-  const isSysMsg = !!message.tags['system-msg'] || message.type == 4
+  const colorValue = (() => {
+    if (!!message.tags['system-msg'] || message.type === 4) {
+      return '#562b70a3'
+    }
+    if (message.type === 2) {
+      return '#2b2b30'
+    }
+    if (!!message.tags['first-msg']) {
+      return '#487f3f3c'
+    }
+    if (!!message.tags['custom-reward-id']) {
+      return '#1c7e8d3c'
+    }
+    return null
+  })()
   if (state.settings.showEmotes.value) {
-    return <LogLineWithEmotes message={message} sysMsg={isSysMsg} />
+    return <LogLineWithEmotes message={message} colorValue={colorValue} />
   }
   const parsed = parseTwitchMessage(message.raw)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
-    <LogLineContainer className="logLine" style={isSysMsg ? { backgroundColor: '#562b70a3', paddingBlock: 1, paddingRight: 8, width: 'fit-content' } : {}}>
+    <LogLineContainer className="logLine" style={colorValue ? { backgroundColor: colorValue, paddingBlock: 1, paddingRight: 8 } : {}}>
       {state.settings.showTimestamp.value && <span className="timestamp">{timestamp}</span>}
       {state.settings.showName.value && <User parsed={parsed as any} displayName={message.displayName} color={message.tags['color']} badges={message.tags['badges'].split(',')} />}
       <Message message={message} thirdPartyEmotes={[]} />
@@ -58,14 +72,14 @@ export function LogLine({ message }: { message: LogMessage }) {
   )
 }
 
-export function LogLineWithEmotes({ message, sysMsg }: { message: LogMessage; sysMsg?: boolean }) {
+export function LogLineWithEmotes({ message, colorValue }: { message: LogMessage; colorValue?: string }) {
   // console.log(message.tags)
   const parsed = parseTwitchMessage(message.raw) as ChatMessage
   const thirdPartyEmotes = useThirdPartyEmotes(parsed.channelId ?? parsed.tags.get('room-id') ?? '')
   const { state } = useContext(store)
   const timestamp = dayjs(message.timestamp).format('YYYY-MM-DD HH:mm:ss')
   return (
-    <LogLineContainer className="logLine" style={sysMsg ? { backgroundColor: '#562b70a3', paddingBlock: 1, paddingRight: 8, width: 'fit-content' } : {}}>
+    <LogLineContainer className="logLine" style={colorValue ? { backgroundColor: colorValue, paddingBlock: 1, paddingRight: 8 } : {}}>
       {state.settings.showTimestamp.value && <span className="timestamp">{timestamp}</span>}
       {state.settings.showName.value && <User parsed={parsed as any} displayName={message.displayName} color={message.tags['color']} badges={message.tags?.['badges']?.split(',') ?? []} />}
       <Message message={message} thirdPartyEmotes={thirdPartyEmotes} />

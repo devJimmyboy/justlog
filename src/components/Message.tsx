@@ -50,7 +50,7 @@ const BaseEmote = styled.img`
   position: relative;
   pointer-events: none;
   div:hover > & {
-    /* border: 1px solid var(--theme2); */
+    /* border: 1px solid var(--theme3); */
     transform: scale(3);
     z-index: 100;
   }

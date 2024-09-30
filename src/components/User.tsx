@@ -8,17 +8,18 @@ import { useUserBadges } from '../hooks/useUserBadges'
 import { CustomTooltip } from './Message'
 
 const UserRoot = styled.div`
+  margin-left: 5px;
   display: inline-flex;
   font-weight: 600;
   transition: scale 0.2s ease-in-out;
   cursor: pointer;
   &:hover {
-    scale: 1.02;
-    text-shadow: 0 0 5px var(--theme2);
+    /* scale: 1.02; */
+    /* text-shadow: 0 0 5px var(--theme2); */
   }
 
   &:active {
-    scale: 0.98;
+    /* scale: 0.98; */
   }
 `
 
@@ -44,11 +45,11 @@ const UserContainer = styled.div.attrs((props) => ({
 const UserBadge = styled.img`
   height: 1rem;
   display: inline;
-  vertical-align: middle;
+
   margin-right: 2px;
-  &:first-of-type {
+  /* &:first-of-type {
     margin-left: 4px;
-  }
+  } */
 `
 
 export function User({ displayName, color, badges, parsed }: { displayName: string; color: string; badges: string[]; parsed: ChatMessage }): JSX.Element {
@@ -60,6 +61,8 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
   // if (!render) return null
   const channelBadges = useBadges(parsed.channelId)
   const userBadges = useUserBadges(parsed.userInfo?.userId)
+
+  if (!parsed.id) return
 
   return (
     <UserRoot>
@@ -74,14 +77,25 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
             <CustomTooltip
               key={`badge-${parsed.date.toISOString()}-${i}`}
               title={
-                <Stack justifyContent="center">
-                  <img src={ffz ? url : badge.urls.big} />
+                <Stack justifyContent="center" alignItems="center" textAlign="center" gap="5px">
+                  <img
+                    src={badge.urls.big}
+                    style={{
+                      height: 72,
+                      width: 72,
+                      background: badge.code === 'moderator/1' && ffz ? '#00ad03' : 'transparent',
+                      borderRadius: '0.5em',
+                    }}
+                  />
                   <span>{badge.title}</span>
                 </Stack>
               }>
               {badge.action ? (
                 <a href={badge.action} target={badge.code}>
-                  <UserBadge src={url} style={{ height: '1.1rem' }} />{' '}
+                  <UserBadge
+                    src={url}
+                    style={{ height: '1.1rem', backgroundColor: badge.code === 'moderator/1' ? '#00ad03' : 'transparent', borderRadius: badge.code === 'moderator/1' ? '0.15em' : '0' }}
+                  />{' '}
                 </a>
               ) : (
                 <UserBadge
@@ -104,8 +118,8 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
           <CustomTooltip
             key={`badge-${parsed.date.toISOString()}-${i}`}
             title={
-              <Stack justifyContent="center" alignContent="center">
-                <img src={badge.urls.big} style={{ maxHeight: 128, maxWidth: 128 }} />
+              <Stack justifyContent="center" alignItems="center" textAlign="center" gap="5px">
+                <img src={badge.urls.big} style={{ height: 72, width: 72 }} />
                 <span>{badge.title}</span>
               </Stack>
             }>

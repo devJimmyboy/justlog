@@ -78,12 +78,11 @@ export function useUserBadges(userId: string): {
                 medium: `https://cdn.7tv.app/badge/${badge.id}/2x`,
                 small: `https://cdn.7tv.app/badge/${badge.id}/1x`,
               },
-              action: '',
+              action: 'https://7tv.app/store',
             }
           })
           return cosmetics
         })
-
       return {
         badges: sevenTvBadges.badges,
         paints: sevenTvBadges.paints,
