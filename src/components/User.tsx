@@ -1,4 +1,4 @@
-import { Stack, Tooltip } from '@mui/material'
+import { Link, Stack, Tooltip } from '@mui/material'
 import { ChatMessage } from '@twurple/chat'
 import React, { PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
@@ -53,7 +53,11 @@ const UserBadge = styled.img`
     margin-left: 4px;
   } */
 `
-
+const UnstyledLink = styled.a`
+  color: inherit;
+  text-decoration: inherit;
+  cursor: inherit;
+`
 export function User({ displayName, color, badges, parsed }: { displayName: string; color: string; badges: string[]; parsed: ChatMessage }): JSX.Element {
   const renderColor = color !== '' ? color : 'grey'
   // const [render, setRendering] = useState(false)
@@ -138,9 +142,11 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
         )
       })}
       <UserContainer color={renderColor} className="user">
-        <SevenTVPaint paint={userBadges.paint} disabled={!state.settings.showCosmetics.value}>
-          {displayName}
-        </SevenTVPaint>
+        <UnstyledLink href={`https://www.twitch.tv/popout/${state.currentChannel}/viewercard/${state.currentUsername}`} target="_blank">
+          <SevenTVPaint paint={userBadges.paint} disabled={!state.settings.showCosmetics.value}>
+            {displayName}
+          </SevenTVPaint>
+        </UnstyledLink>
         :
       </UserContainer>
     </UserRoot>
@@ -167,20 +173,20 @@ export function SevenTVPaint({ paint, disabled, children }: PropsWithChildren<{ 
     const gradient = paint.repeat ? `repeating-linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})` : `linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})`
 
     return (
-      <CustomTooltip title={paint.name}>
-        <span
-          style={{
-            backgroundImage: gradient,
-            filter: dropShadows.join(' '),
-            backgroundSize: '100%',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0 0',
-            color: 'transparent',
-            WebkitBackgroundClip: 'text',
-          }}>
-          {children}
-        </span>
-      </CustomTooltip>
+      // <CustomTooltip title={paint.name}>
+      <span
+        style={{
+          backgroundImage: gradient,
+          filter: dropShadows.join(' '),
+          backgroundSize: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '0 0',
+          color: 'transparent',
+          WebkitBackgroundClip: 'text',
+        }}>
+        {children}
+      </span>
+      // </CustomTooltip>
     )
   } else if (paint.function === 'RADIAL_GRADIENT' && paint.stops && paint.stops.length) {
     const gradientStops = paint.stops.map((stop) => {
@@ -190,37 +196,37 @@ export function SevenTVPaint({ paint, disabled, children }: PropsWithChildren<{ 
     const gradient = paint.repeat ? `repeating-radial-gradient(circle, ${gradientStops.join(', ')})` : `radial-gradient(circle, ${gradientStops.join(', ')})`
 
     return (
-      <CustomTooltip title={paint.name}>
-        <span
-          style={{
-            backgroundImage: gradient,
-            filter: dropShadows.join(' '),
-            backgroundSize: '100%',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0 0',
-            color: 'transparent',
-            WebkitBackgroundClip: 'text',
-          }}>
-          {children}
-        </span>
-      </CustomTooltip>
+      // <CustomTooltip title={paint.name}>
+      <span
+        style={{
+          backgroundImage: gradient,
+          filter: dropShadows.join(' '),
+          backgroundSize: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '0 0',
+          color: 'transparent',
+          WebkitBackgroundClip: 'text',
+        }}>
+        {children}
+      </span>
+      // </CustomTooltip>
     )
   } else if (paint.function === 'URL' && paint.image_url) {
     return (
-      <CustomTooltip title={paint.name}>
-        <span
-          style={{
-            backgroundImage: `url(${paint.image_url})`,
-            filter: dropShadows.join(' '),
-            backgroundSize: '100%',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0 0',
-            color: 'transparent',
-            WebkitBackgroundClip: 'text',
-          }}>
-          {children}
-        </span>
-      </CustomTooltip>
+      // <CustomTooltip title={paint.name}>
+      <span
+        style={{
+          backgroundImage: `url(${paint.image_url})`,
+          filter: dropShadows.join(' '),
+          backgroundSize: '100%',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '0 0',
+          color: 'transparent',
+          WebkitBackgroundClip: 'text',
+        }}>
+        {children}
+      </span>
+      // </CustomTooltip>
     )
   }
 
