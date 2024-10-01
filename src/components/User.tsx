@@ -226,7 +226,7 @@ export function SevenTVPaint({ paint, disabled, children }: PropsWithChildren<{ 
 
   return (
     <CustomTooltip title={paint.name}>
-      <span style={{ backgroundSize: '100%', backgroundRepeat: 'no-repeat', backgroundPosition: '0 0', color: 'transparent', WebkitBackgroundClip: 'text' }}>{children}</span>
+      <span>{children}</span>
     </CustomTooltip>
   )
 }
