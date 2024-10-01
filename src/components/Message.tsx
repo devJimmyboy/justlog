@@ -5,7 +5,7 @@ import { store } from '../store'
 import type { Emote as IEmote, LogMessage } from '../types/log'
 import { ThirdPartyEmote } from '../types/ThirdPartyEmote'
 import runes from 'runes'
-import { Link } from '@mui/material'
+import { Link, Stack } from '@mui/material'
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
 import { LinkPreview } from './LinkPreview'
 
@@ -29,15 +29,41 @@ const Emote = ({ emote, type }: { emote: IEmote; type: 'twitch' } | { emote: Thi
   const [hovering, setHover] = useState(false)
   if (type === 'thirdparty')
     return (
-      <div style={{ maxHeight: 18, width: 'auto', display: 'inline-block' }} onMouseEnter={() => setHover(true)} title={emote.code}>
-        <BaseEmote className="emote" alt={emote.code} src={hovering ? emote.urls.big : emote.urls.small} />
-      </div>
+      <CustomTooltip
+        title={
+          <Stack alignItems="center" justifyContent="center" gap={1}>
+            <img src={emote.urls.big} style={{ maxHeight: 112, width: 'auto' }} />
+            <div style={{ fontSize: 12, color: 'white', textAlign: 'center' }}>
+              {emote.code}
+              <br />
+              {emote.provider}
+            </div>
+            <div style={{ fontSize: 12, color: 'white' }}></div>
+          </Stack>
+        }>
+        <div style={{ maxHeight: 18, width: 'auto', display: 'inline-block' }}>
+          <BaseEmote className="emote" alt={emote.code} src={emote.urls.small} />
+        </div>
+      </CustomTooltip>
     )
   else
     return (
-      <div style={{ maxHeight: 18, width: 'auto', display: 'inline-block' }} onMouseEnter={() => setHover(true)} title={emote.code}>
-        <BaseEmote className="emote" alt={emote.code} src={`https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/${hovering ? '3.0' : '1.0'}`} />
-      </div>
+      <CustomTooltip
+        title={
+          <Stack alignItems="center" justifyContent="center" gap={1}>
+            <img src={`https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0`} style={{ maxHeight: 112, width: 'auto' }} />
+            <div style={{ fontSize: 12, color: 'white', textAlign: 'center' }}>
+              {emote.code}
+              <br />
+              Twitch Emote
+            </div>
+            <div style={{ fontSize: 12, color: 'white' }}></div>
+          </Stack>
+        }>
+        <div style={{ maxHeight: 18, width: 'auto', display: 'inline-block' }}>
+          <BaseEmote className="emote" alt={emote.code} src={`https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/1.0`} />
+        </div>
+      </CustomTooltip>
     )
 }
 
@@ -49,11 +75,11 @@ const BaseEmote = styled.img`
   transition: transform 0.15s ease-in-out;
   position: relative;
   pointer-events: none;
-  div:hover > & {
-    /* border: 1px solid var(--theme3); */
+  /* div:hover > & {
+     border: 1px solid var(--theme3); 
     transform: scale(3);
     z-index: 100;
-  }
+  } */
   &:active {
     transform: scale(1.5);
   }

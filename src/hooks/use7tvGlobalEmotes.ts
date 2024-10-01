@@ -40,6 +40,7 @@ export function use7tvGlobalEmotes(): Array<ThirdPartyEmote> {
         medium: `${emoteURL}/${webpEmotes[1].name}`,
         big: `${emoteURL}/${webpEmotes[2].name}`,
       },
+      provider: '7TV Global Emote',
     })
   }
 

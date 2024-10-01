@@ -44,6 +44,7 @@ export function use7tvChannelEmotes(channelId: string): Array<ThirdPartyEmote> {
         medium: `${emoteURL}/${webpEmotes[1]?.name}`,
         big: `${emoteURL}/${webpEmotes[2]?.name}`,
       },
+      provider: '7TV Channel Emote',
     })
   }
 
