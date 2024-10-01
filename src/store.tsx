@@ -7,6 +7,7 @@ export interface Settings {
   showName: Setting
   showTimestamp: Setting
   // twitchChatMode: Setting
+  showCosmetics: Setting
   newOnBottom: Setting
 }
 
@@ -59,6 +60,10 @@ const defaultContext = {
       //   displayName: 'Twitch Chat Mode',
       //   value: false,
       // },
+      showCosmetics: {
+        displayName: 'Show 7tv Cosmetics',
+        value: true,
+      },
       newOnBottom: {
         displayName: 'Newest messages on bottom',
         value: false,

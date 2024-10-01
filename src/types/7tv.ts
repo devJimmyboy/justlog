@@ -67,7 +67,7 @@ export interface PaintCosmetic {
   stops: {
     at: number
     color: number
-  }
+  }[]
 }
 
 export interface StvCosmeticsResponse {
