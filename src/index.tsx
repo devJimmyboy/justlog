@@ -9,6 +9,7 @@ import { Page } from './components/Page'
 import { StateProvider, store } from './store'
 import { createTheme } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
+import 'overlayscrollbars/overlayscrollbars.css'
 
 const pageTheme = createTheme({
   palette: {

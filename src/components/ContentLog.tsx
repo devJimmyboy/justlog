@@ -7,6 +7,7 @@ import { store } from '../store'
 import { LogLine } from './LogLine'
 import { areEqual, FixedSizeList as List, ListChildComponentProps } from 'react-window'
 import { LogMessage } from '../types/log'
+import { OverlayScrollbarsComponent, useOverlayScrollbars } from 'overlayscrollbars-react'
 
 const ContentLogContainer = styled.ul`
   padding: 0;
@@ -42,6 +43,27 @@ export function ContentLog({ year, month }: { year: string; month: string }) {
   const { state, setState } = useContext(store)
   const [searchText, setSearchText] = useState('')
 
+  // Overlay Scrollbars setup
+  const rootRef = useRef(null)
+  const outerRef = useRef(null)
+  const [initialize, osInstance] = useOverlayScrollbars({ defer: true })
+
+  useEffect(() => {
+    const { current: root } = rootRef
+    const { current: outer } = outerRef
+
+    if (root && outer) {
+      initialize({
+        target: root,
+        elements: {
+          viewport: outer,
+        },
+      })
+    }
+    return () => osInstance()?.destroy()
+  }, [initialize, osInstance])
+  // end Overlay Scrollbars setup
+
   const logs = useLog(state.currentChannel ?? '', state.currentUsername ?? '', year, month).filter((log) => log.text.toLowerCase().includes(searchText.toLowerCase()))
 
   const search = useRef<HTMLInputElement>(null)
@@ -72,11 +94,33 @@ export function ContentLog({ year, month }: { year: string; month: string }) {
           ),
         }}
       />
-      {/*@ts-ignore*/}
-      <List className="list" height={600} itemCount={logs.length} itemSize={20} width={'100%'} itemData={logs}>
+      <div data-overlayscrollbars="" ref={rootRef}>
         {/*@ts-ignore*/}
-        {Row}
-      </List>
+        <List className="list" height={600} itemCount={logs.length} itemSize={20} width={'100%'} itemData={logs} outerRef={outerRef}>
+          {/*@ts-ignore*/}
+          {Row}
+        </List>
+      </div>
     </ContentLogContainer>
   )
 }
+
+// const Overflow = ({ children, onScroll }: { children: React.ReactNode; onScroll: (e: React.UIEvent<HTMLDivElement>) => void }) => {
+//   const ofRef = useRef(null)
+
+//   useEffect(() => {
+//     const el = ofRef.current.osInstance().getElements().viewport
+
+//     if (onScroll) el.addEventListener('scroll', onScroll)
+
+//     return () => {
+//       if (onScroll) el.removeEventListener('scroll', onScroll)
+//     }
+//   }, [onScroll])
+
+//   return (
+//     <OverlayScrollbarsComponent options={{}} ref={ofRef}>
+//       {children}
+//     </OverlayScrollbarsComponent>
+//   )
+// }

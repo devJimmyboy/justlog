@@ -61,8 +61,8 @@ const defaultContext = {
       //   value: false,
       // },
       showCosmetics: {
-        displayName: 'Show 7tv Cosmetics',
-        value: true,
+        displayName: 'Show 7tv Cosmetics (High Performance)',
+        value: false,
       },
       newOnBottom: {
         displayName: 'Newest messages on bottom',

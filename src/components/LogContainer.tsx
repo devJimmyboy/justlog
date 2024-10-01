@@ -5,6 +5,7 @@ import { useAvailableLogs } from '../hooks/useAvailableLogs'
 import { store } from '../store'
 import { Log } from './Log'
 import { OptOutMessage } from './OptOutMessage'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 
 const LogContainerDiv = styled.div`
   color: white;
