@@ -69,6 +69,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
   const userBadges = useUserBadges(parsed.userInfo?.userId)
 
   const { state } = useContext(store)
+  const linkName = state.currentUsername.includes('id:') ? displayName : state.currentUsername
 
   if (!parsed.id) return
 
@@ -142,7 +143,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
         )
       })}
       <UserContainer color={renderColor} className="user">
-        <UnstyledLink href={`https://www.twitch.tv/popout/${state.currentChannel}/viewercard/${state.currentUsername}`} target="_blank">
+        <UnstyledLink href={`https://www.twitch.tv/popout/${state.currentChannel}/viewercard/${linkName}`} target="_blank">
           <SevenTVPaint paint={userBadges.paint} disabled={!state.settings.showCosmetics.value}>
             {displayName}
           </SevenTVPaint>
