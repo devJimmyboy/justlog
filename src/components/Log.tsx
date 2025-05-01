@@ -5,14 +5,13 @@ import { Txt } from '../icons/Txt'
 import { getUserId, isUserId } from '../services/isUserId'
 import { store } from '../store'
 import { ContentLog } from './ContentLog'
-import { TwitchChatContentLog } from './TwitchChatLogContainer'
 
 const LogContainer = styled.div`
   position: relative;
   background: var(--bg-bright);
   border-radius: 3px;
   padding: 0.5rem;
-  margin-top: 3rem;
+  margin-top: 0.5rem;
 
   .txt {
     position: absolute;
@@ -28,9 +27,9 @@ const LogContainer = styled.div`
   }
 `
 
-export function Log({ year, month, initialLoad = false }: { year: string; month: string; initialLoad?: boolean }) {
+export function Log({ year, month, searchText }: { year: string; month: string; searchText: string }) {
   const { state } = useContext(store)
-  const [load, setLoad] = useState(initialLoad)
+  // const [load, setLoad] = useState(initialLoad)
   const [txtHref, setTxtHref] = useState(state.apiBaseUrl)
 
   React.useEffect(() => {
@@ -49,33 +48,33 @@ export function Log({ year, month, initialLoad = false }: { year: string; month:
 
     href += `/${year}/${month}?reverse`
     setTxtHref(href)
-  }, [state.currentChannel, state.currentUsername, year, month, load])
-  if (!load) {
-    return (
-      <LogContainer>
-        <LoadableLog year={year} month={month} onLoad={() => setLoad(true)} />
-      </LogContainer>
-    )
-  }
+  }, [state.currentChannel, state.currentUsername, year, month])
+  // if (!load) {
+  //   return (
+  //     <LogContainer>
+  //       <LoadableLog year={year} month={month} onLoad={() => setLoad(true)} />
+  //     </LogContainer>
+  //   )
+  // }
 
   return (
     <LogContainer>
       <a className="txt" target="__blank" href={txtHref} rel="noopener noreferrer">
         <Txt />
       </a>
-      <ContentLog year={year} month={month} />
+      <ContentLog year={year} month={month} searchText={searchText} />
     </LogContainer>
   )
 }
 
-const LoadableLogContainer = styled.div``
+// const LoadableLogContainer = styled.div``
 
-function LoadableLog({ year, month, onLoad }: { year: string; month: string; onLoad: () => void }) {
-  return (
-    <LoadableLogContainer>
-      <Button variant="contained" color="primary" size="large" onClick={onLoad}>
-        load {year}/{month}
-      </Button>
-    </LoadableLogContainer>
-  )
-}
+// function LoadableLog({ year, month, onLoad }: { year: string; month: string; onLoad: () => void }) {
+//   return (
+//     <LoadableLogContainer>
+//       <Button variant="contained" color="primary" size="large" onClick={onLoad}>
+//         load {year}/{month}
+//       </Button>
+//     </LoadableLogContainer>
+//   )
+// }

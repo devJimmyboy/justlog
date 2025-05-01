@@ -71,7 +71,7 @@ export function User({ displayName, color, badges, parsed }: { displayName: stri
   const { state } = useContext(store)
   const linkName = state.currentUsername.includes('id:') ? displayName : state.currentUsername
 
-  if (!parsed.id) return
+  if (!parsed.userInfo?.userId) return
 
   return (
     <UserRoot>
